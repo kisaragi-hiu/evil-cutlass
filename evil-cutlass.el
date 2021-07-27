@@ -3,7 +3,7 @@
 ;; Author: Kisaragi Hiu <mail@kisragi-hiu.com>
 ;; URL:
 ;; Package-Requires: ((emacs "24.4") (evil "1.0.0"))
-;; Version: 0.0.1
+;; Version: 0.1.0
 ;; Keywords: emulations, evil, vim, convenience
 
 ;; This file is NOT part of GNU Emacs.
@@ -26,7 +26,7 @@
 ;; Modify evil's change and deletion operators to just delete without
 ;; modifying the default register.
 ;;
-;; A register can still be provided with `evil-use-register' (the `"' key).
+;; `evil-use-register' can still be used as usual.
 ;;
 ;;; Code:
 
@@ -37,19 +37,71 @@
   :prefix "evil-cutlass-"
   :group 'evil)
 
-(defun evil-cutlass-advice (cmd &rest _args)
-  "Advice to set CMD's default register to the black hole register."
+(defun evil-cutlass--third-advice (cmd &rest args)
+  "Use this as an advice like this:
+
+  (advice-add 'evil-change-whole-line :around #'evil-cutlass--third-advice)
+
+This will then make `evil-change' use the black hole register by default.
+
+The \"third\" in the name refers to the fact that `evil-change'
+accepts REGISTER as the fourth argument. This has to be done as
+`evil-this-register' is read in the interactive declaration,
+which is run before advices, so setting it in an advice like this
+will not have any effect. For commands that accept REGISTER as
+the fourth argument, use `evil-cutlass--fourth-advice' instead.
+
+CMD is the original function. ARGS is the argument list."
+  ;; If `evil-this-register' is nil, that means the user did not
+  ;; specify another register, so we swap out the register argument
+  ;; with the black hole register. It isn't cleared until the end of
+  ;; the command, allowing us to still see its value at this point.
   (unless evil-this-register
-    (setq evil-this-register ?_))
-  (call-interactively cmd))
+    (setq args (list (elt args 0)
+                     (elt args 1)
+                     ?_
+                     ;; nthcdr = -drop
+                     (nthcdr 3 args))))
+  (apply cmd args))
+
+(defun evil-cutlass--fourth-advice (cmd &rest args)
+  "Use this as an advice like this:
+
+  (advice-add 'evil-change :around #'evil-cutlass--fourth-advice)
+
+This will then make `evil-change' use the black hole register by default.
+
+The \"fourth\" in the name refers to the fact that `evil-change'
+accepts REGISTER as the fourth argument. This has to be done as
+`evil-this-register' is read in the interactive declaration,
+which is run before advices, so setting it in an advice like this
+will not have any effect. For commands that accept REGISTER as
+the third argument, use `evil-cutlass--third-advice' instead.
+
+CMD is the original function. ARGS is the argument list."
+  ;; If `evil-this-register' is nil, that means the user did not
+  ;; specify another register, so we swap out the register argument
+  ;; with the black hole register. It isn't cleared until the end of
+  ;; the command, allowing us to still see its value at this point.
+  (unless evil-this-register
+    (setq args (list (elt args 0)
+                     (elt args 1)
+                     (elt args 2)
+                     ?_
+                     ;; nthcdr = -drop
+                     (nthcdr 4 args))))
+  (apply cmd args))
 
 (defvar evil-cutlass--commands
-  '((evil-delete                :switch evil-goggles-enable-delete                :advice evil-goggles--generic-blocking-advice)
-    (evil-delete-line           :switch evil-goggles-enable-delete                :advice evil-goggles--delete-line-advice)
-    (evil-org-delete            :switch evil-goggles-enable-delete                :advice evil-goggles--delete-line-advice)
-    (evil-change                :switch evil-goggles-enable-change                :advice evil-goggles--generic-blocking-advice)
-    (evil-change-line           :switch evil-goggles-enable-change                :advice evil-goggles--generic-blocking-advice)
-    (evil-change-whole-line     :switch evil-goggles-enable-change                :advice evil-goggles--generic-blocking-advice)))
+  '((evil-change                 :advice evil-cutlass--fourth-advice)
+    (evil-change-line            :advice evil-cutlass--fourth-advice)
+    (evil-substitute             :advice evil-cutlass--fourth-advice)
+    (evil-change-whole-line      :advice evil-cutlass--third-advice)
+    (evil-org-delete             :advice evil-cutlass--fourth-advice)
+    (evil-delete                 :advice evil-cutlass--fourth-advice)
+    (evil-delete-line            :advice evil-cutlass--fourth-advice)
+    (evil-delete-char            :advice evil-cutlass--fourth-advice)
+    (evil-delete-backward-char   :advice evil-cutlass--fourth-advice)))
 
 (defcustom evil-cutlass-lighter
   " Cutlass"
@@ -68,13 +120,10 @@
         ;; add advice
         (dolist (command-cfg evil-cutlass--commands)
           (let ((cmd (car command-cfg))
-                (advice (plist-get (cdr command-cfg) :advice))
-                (switch (plist-get (cdr command-cfg) :switch))
-                (after  (plist-get (cdr command-cfg) :after)))
-            (when (symbol-value switch)
-              (advice-add cmd (if after :after :before) advice)))))
+                (advice (plist-get (cdr command-cfg) :advice)))
+            (advice-add cmd :around advice))))
     ;; remove advice
-    (dolist (command-cfg evil-goggles--commands)
+    (dolist (command-cfg evil-cutlass--commands)
       (let ((cmd (car command-cfg))
             (advice (plist-get (cdr command-cfg) :advice)))
         (advice-remove cmd advice)))))
