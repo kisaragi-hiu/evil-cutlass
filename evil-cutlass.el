@@ -1,9 +1,9 @@
-;;; evil-cutlass.el --- Make evil deletion operators actually just delete -*- lexical-binding: t -8 -*-
+;;; evil-cutlass.el --- Make evil deletion operators actually just delete -*- lexical-binding: t -*-
 
 ;; Author: Kisaragi Hiu <mail@kisragi-hiu.com>
 ;; URL:
 ;; Package-Requires: ((emacs "24.4") (evil "1.0.0"))
-;; Version: 0.1.0
+;; Version: 0.2.0
 ;; Keywords: emulations, evil, vim, convenience
 
 ;; This file is NOT part of GNU Emacs.
@@ -36,6 +36,12 @@
   "Cutlass.vim for Emacs"
   :prefix "evil-cutlass-"
   :group 'evil)
+
+(defcustom evil-cutlass-lighter
+  " Cutlass"
+  "String used on the mode-line."
+  :group 'evil-cutlass
+  :type 'string)
 
 (defun evil-cutlass--third-advice (cmd &rest args)
   "Use this as an advice like this:
@@ -84,12 +90,7 @@ CMD is the original function. ARGS is the argument list."
   ;; with the black hole register. It isn't cleared until the end of
   ;; the command, allowing us to still see its value at this point.
   (unless evil-this-register
-    (setq args (list (elt args 0)
-                     (elt args 1)
-                     (elt args 2)
-                     ?_
-                     ;; nthcdr = -drop
-                     (nthcdr 4 args))))
+    (setf (elt args 3) ?_))
   (apply cmd args))
 
 (defvar evil-cutlass--commands
@@ -103,17 +104,18 @@ CMD is the original function. ARGS is the argument list."
     (evil-delete-char            :advice evil-cutlass--fourth-advice)
     (evil-delete-backward-char   :advice evil-cutlass--fourth-advice)))
 
-(defcustom evil-cutlass-lighter
-  " Cutlass"
-  "String used on the mode-line."
-  :group 'evil-cutlass
-  :type 'string)
+;; This is before the advice is applied.
+;;;###autoload
+(defalias 'evil-cutlass-cut (symbol-function 'evil-delete))
 
 ;;;###autoload
 (define-minor-mode evil-cutlass-mode
-  "evil-goggles global minor mode."
+  "Create a distinction between cut and delete for Evil."
   :lighter " Cutlass"
   :global t
+  :keymap (let ((map (make-sparse-keymap)))
+            (evil-define-key* 'normal map "x" #'evil-cutlass-cut)
+            map)
   :require 'evil-cutlass
   (if evil-cutlass-mode
       (progn
