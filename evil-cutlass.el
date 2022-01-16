@@ -104,7 +104,6 @@ CMD is the original function. ARGS is the argument list."
     (evil-delete-char            :advice evil-cutlass--fourth-advice)
     (evil-delete-backward-char   :advice evil-cutlass--fourth-advice)))
 
-;; This is before the advice is applied.
 ;;;###autoload
 (defalias 'evil-cutlass-cut (symbol-function 'evil-delete))
 
@@ -119,6 +118,8 @@ CMD is the original function. ARGS is the argument list."
   :require 'evil-cutlass
   (if evil-cutlass-mode
       (progn
+        ;; update any possible changes to `evil-delete'
+        (fset 'evil-cutlass-cut (symbol-function 'evil-delete))
         ;; add advice
         (dolist (command-cfg evil-cutlass--commands)
           (let ((cmd (car command-cfg))
