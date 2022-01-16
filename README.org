@@ -1,0 +1,20 @@
+* evil-cutlass
+
+Evil port of [[https://github.com/svermeulen/vim-cutlass][vim-cutlass]].
+
+** Set up
+
+#+begin_src emacs-lisp
+(straight-use-package '(evil-cutlass
+                        :repo "https://github.com/kisaragi-hiu/evil-cutlass"))
+(evil-cutlass-mode)
+#+end_src
+
+Now =x= will cut text into the default register (like =d= originally), while other evil commands will not edit the register by default.
+
+="= (=evil-use-register=) still works, so ="adw= still cuts the word into the a register.
+
+** Acknowledgments
+
+- https://github.com/svermeulen/vim-cutlass :: original
+- https://github.com/edkolev/evil-goggles :: I copied how it advises evil commands
