@@ -77,7 +77,12 @@ BEG, END, TYPE, REGISTER, and YANK-HANDLER are `evil-delete' arguments."
   (funcall orig beg end type register yank-handler))
 
 ;;;###autoload
-(defalias 'evil-cutlass-cut (symbol-function 'evil-delete))
+(defalias 'evil-cutlass-cut (symbol-function 'evil-delete)
+  "Cut text like the original `evil-delete' does.")
+
+;;;###autoload
+(defalias 'evil-cutlass-cut-line (symbol-function 'evil-delete-line)
+  "Cut to end of line like the original `evil-delete-line' does.")
 
 ;;;###autoload
 (define-minor-mode evil-cutlass-mode
@@ -86,6 +91,7 @@ BEG, END, TYPE, REGISTER, and YANK-HANDLER are `evil-delete' arguments."
   :global t
   :keymap (let ((map (make-sparse-keymap)))
             (evil-define-key* 'normal map "x" #'evil-cutlass-cut)
+            (evil-define-key* 'normal map "X" #'evil-cutlass-cut-line)
             map)
   :require 'evil-cutlass
   (if evil-cutlass-mode
