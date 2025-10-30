@@ -1,7 +1,7 @@
 ;;; evil-cutlass.el --- Make evil deletion operators actually just delete -*- lexical-binding: t -*-
 
 ;; Author: Kisaragi Hiu <mail@kisragi-hiu.com>
-;; URL:
+;; URL: https://github.com/kisaragi-hiu/evil-cutlass
 ;; Package-Requires: ((emacs "24.4") (evil "1.0.0"))
 ;; Version: 0.2.0
 ;; Keywords: emulations, evil, vim, convenience
@@ -33,7 +33,7 @@
 (require 'evil)
 
 (defgroup evil-cutlass nil
-  "Cutlass.vim for Emacs"
+  "Cutlass.vim for Emacs."
   :prefix "evil-cutlass-"
   :group 'evil)
 
@@ -46,7 +46,8 @@
 (defun evil-cutlass--third-advice (cmd &rest args)
   "Use this as an advice like this:
 
-  (advice-add 'evil-change-whole-line :around #'evil-cutlass--third-advice)
+  (advice-add \\='evil-change-whole-line
+              :around #\\='evil-cutlass--third-advice)
 
 This will then make `evil-change' use the black hole register by default.
 
@@ -73,7 +74,8 @@ CMD is the original function. ARGS is the argument list."
 (defun evil-cutlass--fourth-advice (cmd &rest args)
   "Use this as an advice like this:
 
-  (advice-add 'evil-change :around #'evil-cutlass--fourth-advice)
+  (advice-add \\='evil-change
+              :around #\\='evil-cutlass--fourth-advice)
 
 This will then make `evil-change' use the black hole register by default.
 
