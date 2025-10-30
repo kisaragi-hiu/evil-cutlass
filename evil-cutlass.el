@@ -43,6 +43,13 @@
   :group 'evil-cutlass
   :type 'string)
 
+(defcustom evil-cutlass-override-kill-region t
+  "Whether to override `kill-region' or not.
+`kill-region' isn\\='t an Evil thing, so it may make sense for this to
+not modify it."
+  :group 'evil-cutlass
+  :type 'boolean)
+
 ;; A manually collected stack of evil commands that end up calling evil-yank:
 ;;
 ;; (legend:
@@ -107,7 +114,8 @@ BEG, END, and REGION are `kill-region' arguments."
   (if evil-cutlass-mode
       (progn
         (advice-add #'evil-delete :around #'evil-cutlass--redirect-to-blackhole-advice)
-        (advice-add #'kill-region :around #'evil-cutlass--kill-region-only-delete-advice))
+        (when evil-cutlass-override-kill-region
+          (advice-add #'kill-region :around #'evil-cutlass--kill-region-only-delete-advice)))
     (advice-remove #'evil-delete #'evil-cutlass--redirect-to-blackhole-advice)
     (advice-remove #'kill-region #'evil-cutlass--kill-region-only-delete-advice)))
 
