@@ -2,20 +2,21 @@
 
 Override delete operations to not affect the clipboard. Evil port of [[https://github.com/svermeulen/vim-cutlass][vim-cutlass]].
 
-Specifically, these commands are overriden to use the black hole register by default:
+Every command that uses =evil-delete= except =evil-visual-paste= would use the the blackhole register by default, making them delete instead of cut. This includes:
 
 - =c= and =cc= (evil-change)
 - =C= (evil-change-line)
-- =s= (evil-substitute)
 - =S= (evil-change-whole-line)
+- =s= (evil-substitute)
 - =d= and =dd= (evil-delete)
-- =D= (evil-delete-line)
-- =x= (evil-delete-char)
 - =X= (evil-delete-backward-char)
-
-these operations will delete instead of cut.
+- =x= (evil-delete-char)
+- =D= (evil-delete-line)
+- =C-u= (evil-delete-whole-line)
 
 ="= (evil-use-register) still works while evil-cutlass is active.
+
+Selecting text in visual state then pasting over it runs =evil-visual-paste=, which also modifies the clipboard, but this behavior can already be controlled by =evil-kill-on-visual-paste=.
 
 ** Setup
 
