@@ -106,10 +106,6 @@ BEG, END, and REGION are `kill-region' arguments."
   "Create a distinction between cut and delete for Evil."
   :lighter " Cutlass"
   :global t
-  :keymap (let ((map (make-sparse-keymap)))
-            (evil-define-key* 'normal map "x" #'evil-cutlass-cut)
-            (evil-define-key* 'normal map "X" #'evil-cutlass-cut-line)
-            map)
   :require 'evil-cutlass
   (if evil-cutlass-mode
       (progn
