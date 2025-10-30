@@ -10,17 +10,9 @@ Override delete operations to not affect the clipboard / kill ring. Evil port of
 
 ** Usage
 
-Turn on the global minor mode, =evil-cutlass-mode=. Now every command that uses =evil-delete= except =evil-visual-paste= would use the the blackhole register by default, making them delete instead of cut. This includes:
+Turn on the global minor mode, =evil-cutlass-mode=. Now every command that uses =evil-delete= (except =evil-visual-paste=) would use the the blackhole register by default, making them delete instead of cut. This includes evil-change (=c=, =cc=, =C=, =S=), evil-substitute (=s=), evil-delete (=d=, =dd=, =D=, =C-u=), evil-delete-char (=x=, =X=), among others.
 
-- =c= and =cc= (evil-change)
-- =C= (evil-change-line)
-- =S= (evil-change-whole-line)
-- =s= (evil-substitute)
-- =d= and =dd= (evil-delete)
-- =X= (evil-delete-backward-char)
-- =x= (evil-delete-char)
-- =D= (evil-delete-line)
-- =C-u= (evil-delete-whole-line)
+Every command that uses =kill-region= is also modified to only delete the region instead of cutting it.
 
 =evil-visual-paste=, ie. pasting text over selected text in visual state, also modifies the clipboard. Evil already provides =evil-kill-on-visual-paste= for toggling this.
 
@@ -47,8 +39,6 @@ To cut text, either bind and use =evil-cutlass-cut= and =evil-cutlass-cut-line=,
 (evil-define-key* 'normal evil-cutlass-mode-map "X" #'evil-cutlass-cut-line)
 #+end_src
 
-** todos
-- also make backward-kill-word (C-DEL) not clobber the clipboard
 ** Compared to vim-cutlass and [[https://github.com/nelstrom/vim-cutlass][the original proposal]]
 
 - vim-cutlass does not support specifying registers for the overriden commands.

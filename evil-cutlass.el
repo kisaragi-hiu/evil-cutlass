@@ -76,6 +76,16 @@ BEG, END, TYPE, REGISTER, and YANK-HANDLER are `evil-delete' arguments."
     (setq register ?_))
   (funcall orig beg end type register yank-handler))
 
+(defun evil-cutlass--kill-region-only-delete-advice (orig beg end &optional region)
+  "Advice to make `kill-region' delete the region without copying.
+ORIG is the original `kill-region' function.
+BEG, END, and REGION are `kill-region' arguments."
+  ;; kill-region does the deletion and copying. Here we want to override the
+  ;; copying to be no-op.
+  (cl-letf (((symbol-function #'kill-new) #'ignore)
+            ((symbol-function #'kill-append) #'ignore))
+    (funcall orig beg end region)))
+
 ;;;###autoload
 (defalias 'evil-cutlass-cut (symbol-function 'evil-delete)
   "Cut text like the original `evil-delete' does.")
@@ -95,8 +105,11 @@ BEG, END, TYPE, REGISTER, and YANK-HANDLER are `evil-delete' arguments."
             map)
   :require 'evil-cutlass
   (if evil-cutlass-mode
-      (advice-add #'evil-delete :around #'evil-cutlass--redirect-to-blackhole-advice)
-    (advice-remove #'evil-delete #'evil-cutlass--redirect-to-blackhole-advice)))
+      (progn
+        (advice-add #'evil-delete :around #'evil-cutlass--redirect-to-blackhole-advice)
+        (advice-add #'kill-region :around #'evil-cutlass--kill-region-only-delete-advice))
+    (advice-remove #'evil-delete #'evil-cutlass--redirect-to-blackhole-advice)
+    (advice-remove #'kill-region #'evil-cutlass--kill-region-only-delete-advice)))
 
 (provide 'evil-cutlass)
 
