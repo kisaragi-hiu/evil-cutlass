@@ -3,7 +3,7 @@
 ;; Author: Kisaragi Hiu <mail@kisragi-hiu.com>
 ;; URL: https://github.com/kisaragi-hiu/evil-cutlass
 ;; Package-Requires: ((emacs "24.4") (evil "1.0.0"))
-;; Version: 0.3.0
+;; Version: 0.3.1
 ;; Keywords: emulations, evil, vim, convenience
 
 ;; This file is NOT part of GNU Emacs.
