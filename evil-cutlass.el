@@ -95,11 +95,7 @@ BEG, END, TYPE, REGISTER, and YANK-HANDLER are `evil-delete' arguments."
             map)
   :require 'evil-cutlass
   (if evil-cutlass-mode
-      (progn
-        ;; update any possible changes to `evil-delete'
-        (fset 'evil-cutlass-cut (symbol-function 'evil-delete))
-        (advice-add #'evil-delete :around #'evil-cutlass--redirect-to-blackhole-advice))
-    ;; remove advice
+      (advice-add #'evil-delete :around #'evil-cutlass--redirect-to-blackhole-advice)
     (advice-remove #'evil-delete #'evil-cutlass--redirect-to-blackhole-advice)))
 
 (provide 'evil-cutlass)
