@@ -1,3 +1,9 @@
+* Unstable!
+
+While this package has stayed the same (abandoned) for the last ~4 years (2022-01 ~ 2025-10-31), now I'm interested in working on it again and actually using it.
+
+I want to test out what works, so I want the liberty to make incompatible changes.
+
 * evil-cutlass
 
 Override delete operations to not affect the clipboard / kill ring. Evil port of [[https://github.com/svermeulen/vim-cutlass][vim-cutlass]].
