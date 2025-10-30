@@ -2,7 +2,9 @@
 
 Override delete operations to not affect the clipboard / kill ring. Evil port of [[https://github.com/svermeulen/vim-cutlass][vim-cutlass]].
 
-Every command that uses =evil-delete= except =evil-visual-paste= would use the the blackhole register by default, making them delete instead of cut. This includes:
+** Usage
+
+Turn on the global minor mode, =evil-cutlass-mode=. Now every command that uses =evil-delete= except =evil-visual-paste= would use the the blackhole register by default, making them delete instead of cut. This includes:
 
 - =c= and =cc= (evil-change)
 - =C= (evil-change-line)
@@ -14,20 +16,30 @@ Every command that uses =evil-delete= except =evil-visual-paste= would use the t
 - =D= (evil-delete-line)
 - =C-u= (evil-delete-whole-line)
 
+=evil-visual-paste=, ie. pasting text over selected text in visual state, also modifies the clipboard. Evil already provides =evil-kill-on-visual-paste= for toggling this.
+
 ="= (evil-use-register) still works while evil-cutlass is active. Note that because Evil also copies into the clipboard / kill ring when copying into any register that's not the blackhole register, this will then clobber the clipboard just as usual.
 
-For =evil-visual-paste=, ie. pasting text over selected text in visual state, this also modifies the clipboard. Evil already provides =evil-kill-on-visual-paste= for toggling this
+To cut text, either bind and use =evil-cutlass-cut= and =evil-cutlass-cut-line=, or perhaps just turn off the mode. There are unfortunately too many evil-derived functions to create an alternative keybinding for all of them at once.
 
 ** Setup
 
 #+begin_src emacs-lisp
-(straight-use-package '(evil-cutlass :repo "https://github.com/kisaragi-hiu/evil-cutlass"))
+(straight-use-package '(evil-cutlass :host github :repo "kisaragi-hiu/evil-cutlass"))
+
+;; Turn on the mode globally by default:
 (evil-cutlass-mode)
+
+;; Or bind a key to toggle the minor mode:
+(general-define-key
+ :prefix "SPC"
+ :states '(normal)
+ "tc" #'evil-cutlass-mode)
+
+;; Maybe bind keys for cutting:
+(evil-define-key* 'normal evil-cutlass-mode-map "x" #'evil-cutlass-cut)
+(evil-define-key* 'normal evil-cutlass-mode-map "X" #'evil-cutlass-cut-line)
 #+end_src
-
-Now =x= will cut text into the default register (like =d= originally), while other evil commands will not edit the register by default.
-
-="= (=evil-use-register=) still works, so ="adw= still cuts the word into the a register.
 
 ** todos
 - also make backward-kill-word (C-DEL) not clobber the clipboard
