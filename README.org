@@ -1,6 +1,6 @@
 * evil-cutlass
 
-Override delete operations to not affect the clipboard. Evil port of [[https://github.com/svermeulen/vim-cutlass][vim-cutlass]].
+Override delete operations to not affect the clipboard / kill ring. Evil port of [[https://github.com/svermeulen/vim-cutlass][vim-cutlass]].
 
 Every command that uses =evil-delete= except =evil-visual-paste= would use the the blackhole register by default, making them delete instead of cut. This includes:
 
@@ -14,9 +14,9 @@ Every command that uses =evil-delete= except =evil-visual-paste= would use the t
 - =D= (evil-delete-line)
 - =C-u= (evil-delete-whole-line)
 
-="= (evil-use-register) still works while evil-cutlass is active.
+="= (evil-use-register) still works while evil-cutlass is active. Note that because Evil also copies into the clipboard / kill ring when copying into any register that's not the blackhole register, this will then clobber the clipboard just as usual.
 
-Selecting text in visual state then pasting over it runs =evil-visual-paste=, which also modifies the clipboard, but this behavior can already be controlled by =evil-kill-on-visual-paste=.
+For =evil-visual-paste=, ie. pasting text over selected text in visual state, this also modifies the clipboard. Evil already provides =evil-kill-on-visual-paste= for toggling this
 
 ** Setup
 
@@ -29,7 +29,15 @@ Now =x= will cut text into the default register (like =d= originally), while oth
 
 ="= (=evil-use-register=) still works, so ="adw= still cuts the word into the a register.
 
+** todos
+- also make backward-kill-word (C-DEL) not clobber the clipboard
+** Compared to vim-cutlass and [[https://github.com/nelstrom/vim-cutlass][the original proposal]]
+
+- vim-cutlass does not support specifying registers for the overriden commands.
+- vim-cutlass does not address evil-visual-paste; neither do I as this is already addressed by Evil itself.
+
 ** Acknowledgments
 
-- https://github.com/svermeulen/vim-cutlass :: original
+- https://github.com/nelstrom/vim-cutlass :: original proposal
+- https://github.com/svermeulen/vim-cutlass :: original vim implementation
 - https://github.com/edkolev/evil-goggles :: I copied how it advises evil commands
