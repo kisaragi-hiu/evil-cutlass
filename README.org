@@ -1,12 +1,26 @@
 * evil-cutlass
 
-Evil port of [[https://github.com/svermeulen/vim-cutlass][vim-cutlass]].
+Override delete operations to not affect the clipboard. Evil port of [[https://github.com/svermeulen/vim-cutlass][vim-cutlass]].
 
-** Set up
+Specifically, these commands are overriden to use the black hole register by default:
+
+- =c= and =cc= (evil-change)
+- =C= (evil-change-line)
+- =s= (evil-substitute)
+- =S= (evil-change-whole-line)
+- =d= and =dd= (evil-delete)
+- =D= (evil-delete-line)
+- =x= (evil-delete-char)
+- =X= (evil-delete-backward-char)
+
+these operations will delete instead of cut.
+
+="= (evil-use-register) still works while evil-cutlass is active.
+
+** Setup
 
 #+begin_src emacs-lisp
-(straight-use-package '(evil-cutlass
-                        :repo "https://github.com/kisaragi-hiu/evil-cutlass"))
+(straight-use-package '(evil-cutlass :repo "https://github.com/kisaragi-hiu/evil-cutlass"))
 (evil-cutlass-mode)
 #+end_src
 
